@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEART HEALTH AI Dashboard | Real-Time Diagnostics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <span class="icon">🛡️</span> HEART HEALTH AI
+        </div>
+        <nav>
+            <a href="#" class="nav-link" data-tab="tab-dashboard">Dashboard</a>
+            <a href="#" class="nav-link active" data-tab="tab-scanner">Scanner</a>
+            <a href="#" class="nav-link" data-tab="tab-protocol">Security Protocol</a>
+            <a href="#" class="nav-link" data-tab="tab-records">Records</a>
+        </nav>
+        <div class="live-engine-btn">
+            <span class="dot"></span> LIVE ENGINE
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- =================== DASHBOARD TAB =================== -->
+        <div id="tab-dashboard" class="tab-content" style="display: none; width: 100%;">
+            <div class="charts-row" style="margin-bottom: 20px;">
+                <!-- System Overview -->
+                <div class="card chart-card" style="flex: 1;">
+                    <h3>System Overview</h3>
+                    <p class="subtitle">Aggregate diagnostic metrics across all records.</p>
+                    <div class="chart-container">
+                        <canvas id="systemChart"></canvas>
+                    </div>
+                    <div class="system-legend">
+                        <span class="legend-safe">● Safe</span>
+                        <span class="legend-risk">● High Risk</span>
+                    </div>
+                </div>
+                
+                <!-- Live Network Stream -->
+                <div class="card chart-card" style="flex: 2;">
+                    <h3>Live Network Stream</h3>
+                    <div class="chart-container">
+                        <canvas id="streamChart"></canvas>
+                    </div>
+                    <div class="stream-stats">
+                        <div class="stat-box">
+                            <p>TOTAL RECORDS</p>
+                            <h4 id="stat-total">0</h4>
+                        </div>
+                        <div class="stat-box">
+                            <p>AVG RISK SCORE</p>
+                            <h4 id="stat-avg">0.0</h4>
+                        </div>
+                        <div class="stat-box">
+                            <p>STATUS</p>
+                            <h4 id="stat-status" style="color: #10b981;">SECURE</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================== SCANNER TAB =================== -->
+        <div id="tab-scanner" class="tab-content" style="display: flex; gap: 30px; width: 100%;">
+            <div class="left-col">
+                <!-- Verifier Pro (Input Module) -->
+                <div class="card verifier-pro">
+                    <h3>Verifier Pro</h3>
+                    <p class="subtitle">Manual override for direct parameter input.</p>
+                    
+                    <form id="prediction-form">
+                        <div class="input-group">
+                            <label>Age</label>
+                            <input type="number" id="age" value="35" min="1" max="120">
+                        </div>
+                        <div class="input-group">
+                            <label>Sex</label>
+                            <select id="sex">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Chest Pain</label>
+                            <select id="cp">
+                                <option value="Typical Angina">Typical Angina</option>
+                                <option value="Atypical Angina">Atypical Angina</option>
+                                <option value="Non-Anginal">Non-Anginal</option>
+                                <option value="Asymptomatic">Asymptomatic</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Resting BP</label>
+                            <input type="number" id="trestbps" value="120">
+                        </div>
+                        <div class="input-group">
+                            <label>Cholesterol</label>
+                            <input type="number" id="chol" value="200">
+                        </div>
+                        
+                        <button type="button" class="btn-primary" id="analyze-btn" onclick="submitForm()">ANALYZE DATA</button>
+                        
+                        <button type="button" class="btn-toggle" onclick="toggleAdvanced()">Advanced Parameters ▾</button>
+                        
+                        <div id="advanced-params" style="display: none; margin-top: 15px;">
+                            <div class="input-group">
+                                <label>Fasting Sugar > 120</label>
+                                <select id="fbs"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label>Resting ECG</label>
+                                <select id="restecg">
+                                    <option value="Normal">Normal</option>
+                                    <option value="ST-T Wave">ST-T Wave</option>
+                                    <option value="Hypertrophy">Hypertrophy</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Max Heart Rate</label>
+                                <input type="number" id="thalach" value="160">
+                            </div>
+                            <div class="input-group">
+                                <label>Exercise Angina</label>
+                                <select id="exang"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label>ST Depression</label>
+                                <input type="number" id="oldpeak" value="0.0" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label>ST Slope</label>
+                                <select id="slope">
+                                    <option value="Upsloping">Upsloping</option>
+                                    <option value="Flat">Flat</option>
+                                    <option value="Downsloping">Downsloping</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Vessels (CA)</label>
+                                <input type="number" id="ca" value="0" min="0" max="4">
+                            </div>
+                            <div class="input-group">
+                                <label>Thalassemia</label>
+                                <select id="thal">
+                                    <option value="Normal">Normal</option>
+                                    <option value="Fixed">Fixed</option>
+                                    <option value="Reversible">Reversible</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="right-col">
+                <div class="result-header">
+                    <p class="subtitle">AI ANALYSIS RESULT</p>
+                    <h1 id="main-status" class="status-negative">Safe</h1>
+                    <p class="confidence">Confidence Score: <span id="main-score">0.00%</span></p>
+                </div>
+                
+                <div class="charts-row">
+                    <!-- Feature Profile -->
+                    <div class="card chart-card">
+                        <h3>Feature Profile (Radar)</h3>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Probability Analysis -->
+                    <div class="card chart-card">
+                        <h3>Probability Analysis</h3>
+                        <div class="chart-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bottom-row">
+                    <!-- Health Risk Gauge -->
+                    <div class="card gauge-card" style="flex: 1;">
+                        <h3>Health Risk Gauge</h3>
+                        <div class="gauge-container">
+                            <canvas id="gaugeChart"></canvas>
+                            <div class="gauge-text">
+                                <p>RISK SCORE</p>
+                                <h2 id="gauge-score">0%</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================== SECURITY PROTOCOL TAB =================== -->
+        <div id="tab-protocol" class="tab-content" style="display: none; width: 100%;">
+            <div class="card info-card">
+                <h3>Security Architecture</h3>
+                <p class="subtitle">The HEART HEALTH AI uses a multi-layered diagnostic protocol.</p>
+                <div class="models-grid">
+                    <div class="model-box">
+                        <h4>Random Forest</h4>
+                        <p>Ensemble learning model trained on high-fidelity clinical samples.</p>
+                    </div>
+                    <div class="model-box">
+                        <h4>Logistic Regression</h4>
+                        <p>Statistical baseline for risk probability scaling.</p>
+                    </div>
+                    <div class="model-box">
+                        <h4>MLP Neural Network</h4>
+                        <p>Deep learning analysis of complex physiological relationships.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================== RECORDS TAB =================== -->
+        <div id="tab-records" class="tab-content" style="display: none; width: 100%;">
+            <div class="card records-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Audit Log</h3>
+                    <button class="btn-export" id="export-btn" onclick="exportCSV()">EXPORT CSV</button>
+                </div>
+                
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>AGE</th>
+                            <th>SEX</th>
+                            <th>BP</th>
+                            <th>CHOL</th>
+                            <th>STATUS</th>
+                            <th>RISK SCORE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-tbody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
